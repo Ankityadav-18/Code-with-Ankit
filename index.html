@@ -1,181 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battery Tracker | Ankit Yadav</title>
-    <style>
-        
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: #333;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Battery Tracker</title>
 
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 400px;
-        }
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
 
-        h1 {
-            color: #4CAF50;
-            margin-bottom: 20px;
-        }
+    body{
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
 
-        .battery {
-            width: 200px;
-            height: 80px;
-            border: 4px solid #333;
-            border-radius: 10px;
-            margin: 20px auto;
-            position: relative;
-            background: #ddd;
-        }
+      background: linear-gradient(
+        135deg,
+        #0f172a,
+        #1e293b,
+        #334155
+      );
+    }
 
-        .battery::after {
-            content: '';
-            position: absolute;
-            top: 30%;
-            right: -8px;
-            width: 8px;
-            height: 40%;
-            background: #333;
-            border-radius: 0 2px 2px 0;
-        }
+    .container{
+      width:350px;
+      padding:30px;
+      border-radius:20px;
 
-        .fill {
-            height: 100%;
-            background: linear-gradient(to right, #4CAF50, #8BC34A);
-            border-radius: 5px;
-            transition: width 0.5s ease;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-        }
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
 
-        .low { background: linear-gradient(to right, #f44336, #ff5722); }
-        .medium { background: linear-gradient(to right, #FF9800, #FFC107); }
+      box-shadow:0 8px 30px rgba(0,0,0,0.3);
 
-        .status {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
+      text-align:center;
+      color:white;
+    }
 
-        .details {
-            font-size: 16px;
-            margin-top: 20px;
-        }
+    h1{
+      margin-bottom:25px;
+      font-size:32px;
+      color:#4ade80;
+    }
 
-        .charging {
-            color: #2196F3;
-        }
+    .battery{
+      width:220px;
+      height:100px;
 
-        .error {
-            color: #f44336;
-        }
+      border:5px solid white;
+      border-radius:15px;
 
-        /* Responsive for mobile */
-        @media (max-width: 480px) {
-            .container {
-                margin: 20px;
-                padding: 20px;
-            }
-        }
-    </style>
+      margin:20px auto;
+      position:relative;
+
+      overflow:hidden;
+    }
+
+    .battery::after{
+      content:"";
+      position:absolute;
+
+      right:-18px;
+      top:30px;
+
+      width:12px;
+      height:35px;
+
+      background:white;
+      border-radius:5px;
+    }
+
+    .level{
+      height:100%;
+      width:0%;
+
+      background:linear-gradient(
+        90deg,
+        #22c55e,
+        #4ade80
+      );
+
+      transition:0.5s;
+    }
+
+    .status{
+      margin-top:20px;
+      font-size:18px;
+      line-height:1.8;
+    }
+
+    .battery-text{
+      font-size:34px;
+      font-weight:bold;
+      margin-top:15px;
+    }
+
+    .updated{
+      margin-top:10px;
+      color:#cbd5e1;
+      font-size:15px;
+    }
+  </style>
 </head>
+
 <body>
 
-    <div class="container">
-<h1>Battery Tracker | Ankit Yadav</h1>
-</xai:function_call >  
-<xai:function_call name="edit_file">
-<parameter name="path">
-        <div class="battery">
-            <div class="fill" id="batteryFill"></div>
-        </div>
-        <div class="status" id="batteryStatus">Checking...</div>
-        <div class="details">
-            <p>Level: <span id="batteryLevel">0</span>%</p>
-            <p>Status: <span id="chargingStatus">Unknown</span></p>
-            <p>Last Updated: <span id="lastUpdate">--:--</span></p>
-        </div>
+  <div class="container">
+
+    <h1>Battery Tracker</h1>
+
+    <div class="battery">
+      <div class="level" id="level"></div>
     </div>
 
-    <script>
+    <div class="battery-text" id="batteryText">
+      Loading...
+    </div>
 
-        const batteryFill = document.getElementById('batteryFill');
-        const batteryStatus = document.getElementById('batteryStatus');
-        const batteryLevel = document.getElementById('batteryLevel');
-        const chargingStatus = document.getElementById('chargingStatus');
-        const lastUpdate = document.getElementById('lastUpdate');
+    <div class="status">
+      <p>Level: <span id="percentage"></span>%</p>
+      <p>Status: <span id="charging"></span></p>
+    </div>
 
-        let battery;
+    <div class="updated">
+      Last Updated:
+      <span id="time"></span>
+    </div>
 
-        if ('getBattery' in navigator) {
-            navigator.getBattery().then(function(bat) {
-                battery = bat;
-                updateBatteryInfo();
-                
-                battery.addEventListener('levelchange', updateBatteryInfo);
-                battery.addEventListener('chargingchange', updateBatteryInfo);
-            }).catch(function(err) {
-                showError('Battery API not available: ' + err.message);
-            });
-        } else {
-            showError('Battery Status API not supported in this browser');
+  </div>
+
+<script>
+
+async function batteryInfo(){
+
+    const battery = await navigator.getBattery();
+
+    function updateBattery(){
+
+        const level = Math.floor(battery.level * 100);
+
+        document.getElementById("percentage").innerText = level;
+
+        document.getElementById("charging").innerText =
+            battery.charging ? "Charging" : "Not Charging";
+
+        document.getElementById("level").style.width = level + "%";
+
+        document.getElementById("time").innerText =
+            new Date().toLocaleTimeString();
+
+        const text = document.getElementById("batteryText");
+
+        if(level > 80){
+            text.innerText = "High Battery";
         }
-
-        function updateBatteryInfo() {
-            if (!battery) return;
-
-            const level = Math.round(battery.level * 100);
-            const isCharging = battery.charging;
-            
-            batteryLevel.textContent = level;
-            
-            batteryFill.style.width = level + '%';
-            batteryFill.className = 'fill';
-            if (level < 20) {
-                batteryFill.classList.add('low');
-                batteryStatus.textContent = 'Low Battery! ⚠️';
-            } else if (level < 50) {
-                batteryFill.classList.add('medium');
-                batteryStatus.textContent = 'Medium Battery';
-            } else {
-                batteryStatus.textContent = 'Good Battery ✅';
-            }
-            
-            chargingStatus.textContent = isCharging ? 'Charging' : 'Not Charging';
-            if (isCharging) {
-                chargingStatus.classList.add('charging');
-            } else {
-                chargingStatus.classList.remove('charging');
-            }
-            
-            
-
+        else if(level > 40){
+            text.innerText = "Medium Battery";
         }
-
-        function showError(message) {
-            batteryStatus.textContent = 'Error';
-            batteryStatus.classList.add('error');
-            document.querySelector('.details').innerHTML = '<p class="error">' + message + '</p>';
+        else{
+            text.innerText = "Low Battery";
         }
-        
-        // Initial check
-        console.log('Battery Tracker loaded!');
-    </script>
+    }
 
+    updateBattery();
+
+    battery.addEventListener("levelchange", updateBattery);
+
+    battery.addEventListener("chargingchange", updateBattery);
+}
+
+batteryInfo();
+
+</script>
 
 </body>
 </html>
